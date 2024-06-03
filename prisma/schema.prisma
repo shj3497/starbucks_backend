@@ -1,0 +1,198 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int        @id @default(autoincrement())
+  name         String
+  email        String
+  membership   Membership @relation(fields: [membershipId], references: [id])
+  membershipId Int
+  createdAt    DateTime   @default(now()) @db.DateTime(0)
+  updatedAt    DateTime   @default(now()) @db.DateTime(0)
+}
+
+model Benefit {
+  id          Int                 @id @default(autoincrement())
+  shortTitle  String
+  title       String
+  description String
+  imgUrl      String
+  createdAt   DateTime            @default(now()) @db.DateTime(0)
+  updatedAt   DateTime            @default(now()) @db.DateTime(0)
+  memberships MembershipBenefit[]
+}
+
+model Membership {
+  id        Int                 @id @default(autoincrement())
+  rank      Rank                @default(WELCOME)
+  users     User[]
+  createdAt DateTime            @default(now()) @db.DateTime(0)
+  updatedAt DateTime            @default(now()) @db.DateTime(0)
+  benefits  MembershipBenefit[]
+}
+
+model MembershipBenefit {
+  benefit      Benefit    @relation(fields: [benefitId], references: [id])
+  benefitId    Int
+  membership   Membership @relation(fields: [membershipId], references: [id])
+  membershipId Int
+
+  @@id([benefitId, membershipId])
+}
+
+model News {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?  @default("")
+  thumbnail   String?
+  period      String
+  content     String?
+  type        NewsType @default(NEWS)
+  isFixed     Boolean? @default(false)
+  isHomeList  Boolean? @default(false)
+  createdAt   DateTime @default(now()) @db.DateTime(0)
+  updatedAt   DateTime @default(now()) @db.DateTime(0)
+}
+
+model Menu {
+  id          Int          @id @default(autoincrement())
+  name        String
+  createdAt   DateTime     @default(now()) @db.DateTime(0)
+  updatedAt   DateTime     @default(now()) @db.DateTime(0)
+  beverages   Beverage[]
+  foods       Food[]
+  menuOptions MenuOption[]
+}
+
+model Beverage {
+  id            Int              @id @default(autoincrement())
+  menuId        Int
+  menu          Menu             @relation(fields: [menuId], references: [id])
+  name          String
+  name_en       String?
+  description   String
+  price         String
+  notice        String?
+  imgUrl        String
+  category      BeverageCategory @default(OTHERS)
+  options       BeverageOption[]
+  isBest        Boolean?         @default(false)
+  isNew         Boolean?         @default(false)
+  isRecommended Boolean?         @default(false)
+  isHot         Boolean?         @default(false)
+  isIce         Boolean?         @default(false)
+  createdAt     DateTime         @default(now()) @db.DateTime(0)
+  updatedAt     DateTime         @default(now()) @db.DateTime(0)
+}
+
+model Option {
+  id        Int              @id @default(autoincrement())
+  name      String
+  name_en   String?
+  beverages BeverageOption[]
+  foods     FoodOption[]
+  createdAt DateTime         @default(now()) @db.DateTime(0)
+  updatedAt DateTime         @default(now()) @db.DateTime(0)
+  menus     MenuOption[]
+}
+
+model MenuOption {
+  menuId   Int
+  menu     Menu   @relation(fields: [menuId], references: [id])
+  optionId Int
+  option   Option @relation(fields: [optionId], references: [id])
+
+  @@id([menuId, optionId])
+}
+
+model BeverageOption {
+  beverageId Int
+  beverage   Beverage @relation(fields: [beverageId], references: [id])
+  optionId   Int
+  option     Option   @relation(fields: [optionId], references: [id])
+
+  @@id([beverageId, optionId])
+}
+
+model Food {
+  id            Int          @id @default(autoincrement())
+  menuId        Int
+  menu          Menu         @relation(fields: [menuId], references: [id])
+  name          String
+  name_en       String?
+  description   String
+  price         String
+  notice        String
+  imgUrl        String
+  category      FoodCategory @default(BREAD)
+  options       FoodOption[]
+  isBest        Boolean?     @default(false)
+  isNew         Boolean?     @default(false)
+  isRecommended Boolean?     @default(false)
+  createdAt     DateTime     @default(now()) @db.DateTime(0)
+  updatedAt     DateTime     @default(now()) @db.DateTime(0)
+}
+
+model FoodOption {
+  foodId   Int
+  food     Food   @relation(fields: [foodId], references: [id])
+  optionId Int
+  option   Option @relation(fields: [optionId], references: [id])
+
+  @@id([foodId, optionId])
+}
+
+enum BeverageCategory {
+  FIZZIO
+  ESPRESSO
+  COLDBREW
+  BLONDE
+  DECAF
+  RESERVE_ESPRESSO
+  RESERVE_DRIP
+  TEAVANA
+  REFRESHERS
+  BLENDED
+  BREWED
+  OTHERS
+  TRENTA
+  TOGOBAG
+  RTD
+  SPECIAL_STORE
+}
+
+enum FoodCategory {
+  BREAD
+  CAKE_DESERT
+  SANDWICH_SALAD
+  HOTFOOD
+  FRUIT_YOGURT
+  SNACK
+  ICECREAM
+  SPECIAL_STORE
+  STADIUM
+}
+
+enum Rank {
+  WELCOME
+  GREEN
+  GOLD
+}
+
+enum NewsType {
+  EVENT
+  NEWS
+  NOTICE
+}

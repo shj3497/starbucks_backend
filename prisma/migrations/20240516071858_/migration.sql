@@ -1,0 +1,12 @@
+-- AlterTable
+ALTER TABLE `Beverage` ALTER COLUMN `imgUrl` DROP DEFAULT,
+    ALTER COLUMN `description` DROP DEFAULT,
+    ALTER COLUMN `name_en` DROP DEFAULT,
+    ALTER COLUMN `price` DROP DEFAULT;
+
+-- AlterTable
+ALTER TABLE `Dessert` ALTER COLUMN `name` DROP DEFAULT,
+    ALTER COLUMN `imgUrl` DROP DEFAULT,
+    ALTER COLUMN `description` DROP DEFAULT,
+    ALTER COLUMN `name_en` DROP DEFAULT,
+    ALTER COLUMN `price` DROP DEFAULT;
